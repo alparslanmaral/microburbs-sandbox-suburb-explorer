@@ -268,5 +268,3 @@ How it works:
   - Provide a small GitHub Pages deployment guide to host the UI and use the Worker proxy.
 
 ---
-
-License: MIT-style (please add a LICENSE file if you want to publish publicly).
