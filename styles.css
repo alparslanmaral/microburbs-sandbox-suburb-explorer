@@ -1,0 +1,136 @@
+:root{
+  --bg: #0b1320;
+  --card: #111a2b;
+  --muted: #93a1b5;
+  --text: #e6edf6;
+  --accent: #5b9cff;
+  --accent-2: #36d399;
+  --border: #1d2a44;
+  --shadow: 0 8px 28px rgba(0,0,0,.35);
+}
+
+*{ box-sizing: border-box; }
+html, body { height: 100%; }
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: radial-gradient(1200px 600px at 20% -10%, #13233d 0%, transparent 60%) , var(--bg);
+}
+
+.app-header{
+  padding: 28px 20px 10px;
+  text-align: center;
+}
+.brand{
+  display:flex; align-items:center; justify-content:center; gap:12px;
+}
+.logo-dot{
+  width:14px; height:14px; border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 20px rgba(91,156,255,.6);
+}
+.app-header h1{ margin:0; font-size: 28px; font-weight: 700; letter-spacing:.2px;}
+.subtitle{ margin:8px 0 0; color: var(--muted); }
+
+.container{
+  width: min(1200px, 92vw);
+  margin: 22px auto 60px;
+  display: grid;
+  gap: 16px;
+}
+
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+}
+
+.controls .control-grid{
+  display:grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 14px;
+}
+@media (max-width: 860px){
+  .controls .control-grid{ grid-template-columns: 1fr; }
+}
+
+.field label{
+  display:block; font-size: 13px; color: var(--muted); margin-bottom:6px;
+}
+.field input[type="text"], .field select{
+  width: 100%;
+  appearance:none;
+  background: #0e182a;
+  color: var(--text);
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  outline: none;
+  transition: border .15s ease, box-shadow .2s ease;
+}
+.field input:focus, .field select:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91,156,255,.15);
+}
+.field .hint{ display:block; margin-top:6px; color: var(--muted); font-size: 12px; }
+
+.buttons{ display:flex; gap:10px; align-items:flex-end; }
+button{
+  height: 40px; padding: 0 14px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e182a; color: var(--text);
+  cursor: pointer; font-weight: 600; letter-spacing:.2px;
+}
+button.primary{
+  background: linear-gradient(135deg, var(--accent), #7fc1ff);
+  border-color: transparent; color:#0a1020;
+}
+button.ghost{ background: transparent; }
+
+.toggles{ margin-top: 10px; display:flex; gap:16px; align-items:center; }
+.toggle input{ margin-right:8px; }
+.req-url{
+  margin-top: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  padding:10px 12px; background:#0a1324; border:1px solid var(--border); border-radius:10px;
+  color:#cde1ff; overflow:auto; white-space: nowrap;
+}
+
+.summary-grid{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:10px;
+}
+.kpi{
+  padding:12px; border-radius:12px; border:1px solid var(--border);
+  background: #0d1a2e; display:flex; flex-direction:column; gap:6px;
+}
+.kpi .label{ color: var(--muted); font-size: 12px; }
+.kpi .value{ font-size: 22px; font-weight: 700; }
+.kpi .note{ color: var(--muted); font-size: 12px; }
+
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.muted{ color: var(--muted); font-size: 13px; }
+
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius: 12px; }
+table{ width:100%; border-collapse: collapse; font-size: 14px; }
+thead th{
+  position: sticky; top:0; background:#0f1b2f; z-index:1;
+  text-align:left; padding:10px 12px; border-bottom:1px solid var(--border);
+}
+tbody td{
+  padding:10px 12px; border-bottom:1px dashed #1a2945; color:#d7e4ff;
+}
+tbody tr:hover{ background: rgba(91,156,255,.06); }
+
+.code{
+  background:#0a1324; border-radius: 12px; border:1px solid var(--border);
+  padding:12px; max-height: 420px; overflow:auto; color:#cde1ff;
+}
+
+.hidden{ display:none; }
+
+.app-footer{
+  color: var(--muted); text-align:center; padding: 20px; border-top: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Microburbs Sandbox — Suburb Explorer</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-dot"></div>
+      <h1>Suburb Explorer</h1>
+    </div>
+    <p class="subtitle">Explore Microburbs sandbox data by suburb and endpoint</p>
+  </header>
+
+  <main class="container">
+    <section class="controls card">
+      <div class="control-grid">
+        <div class="field">
+          <label for="suburb">Suburb</label>
+          <input id="suburb" type="text" placeholder="Belmont North" value="Belmont North" />
+          <small class="hint">Tip: Include state if needed, e.g., “Newtown NSW”.</small>
+        </div>
+
+        <div class="field">
+          <label for="endpoint">Endpoint</label>
+          <select id="endpoint"></select>
+          <small class="hint">Matches path in /report_generator/api/suburb/{endpoint}</small>
+        </div>
+
+        <div class="field buttons">
+          <button id="fetchBtn" class="primary">Fetch Data</button>
+          <button id="openUrlBtn" class="ghost">Open URL</button>
+          <button id="copyCurlBtn" class="ghost">Copy cURL</button>
+        </div>
+      </div>
+      <div class="toggles">
+        <label class="toggle">
+          <input type="checkbox" id="toggleRaw" />
+          <span>Show raw JSON</span>
+        </label>
+      </div>
+      <div id="reqUrl" class="req-url"></div>
+    </section>
+
+    <section id="summary" class="card hidden">
+      <h2>Quick Summary</h2>
+      <div id="summaryCards" class="summary-grid"></div>
+    </section>
+
+    <section id="chartSection" class="card hidden">
+      <div class="section-head">
+        <h2>Top Numeric Signals</h2>
+        <span class="muted" id="chartNote"></span>
+      </div>
+      <canvas id="barChart" height="280"></canvas>
+    </section>
+
+    <section id="tableSection" class="card hidden">
+      <div class="section-head">
+        <h2>Data Table</h2>
+        <span class="muted" id="tableNote"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="dataTable"></table>
+      </div>
+    </section>
+
+    <section id="jsonSection" class="card hidden">
+      <h2>Raw JSON</h2>
+      <pre id="rawJson" class="code"></pre>
+    </section>
+
+    <section class="card">
+      <h2>About this tool</h2>
+      <ul>
+        <li>Uses Microburbs Sandbox: Authorization: Bearer test</li>
+        <li>Endpoints are mapped to path segments (amenity, demographics, ethnicity, ...). You can also type a custom endpoint.</li>
+        <li>Automatically summarizes arrays and numbers; shows a simple bar chart of the strongest numeric values it detects.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Built with vanilla HTML/CSS/JS</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
