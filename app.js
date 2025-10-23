@@ -1,5 +1,17 @@
-// SANDBOX base URL (Authorization headers removed)
-const API_BASE = "https://www.microburbs.com.au/report_generator/api/sandbox/suburb";
+// Microburbs Suburb Explorer — app.js
+// Uses a Cloudflare Worker proxy to bypass CORS and (optionally) add Authorization upstream.
+// 1) Set PROXY_BASE to your worker URL (e.g., https://mb-proxy-yourname.workers.dev)
+// 2) If you want to hit sandbox instead of live API via the worker, set PATH_PREFIX = "sandbox/suburb"
+// 3) Keep fetch() without headers (proxy adds Authorization for non-sandbox paths)
+
+const USE_PROXY = true;
+const PROXY_BASE = "https://mb-proxy-yourname.workers.dev"; // TODO: replace with your Worker URL
+const SANDBOX_BASE_DIRECT = "https://www.microburbs.com.au/report_generator/api/sandbox/suburb"; // fallback if not using proxy
+
+// Choose which upstream path to proxy:
+// - "suburb" → worker will call /report_generator/api/suburb/<slug>?...
+// - "sandbox/suburb" → worker will call /report_generator/api/sandbox/suburb/<slug>?...
+const PATH_PREFIX = "suburb"; // or "sandbox/suburb"
 
 const endpointOptions = [
   { label: "Amenities", slug: "amenity" },
@@ -79,8 +91,15 @@ function getSlug(){
 function buildUrl(){
   const suburb = (els.suburb.value || "").trim();
   const slug = getSlug();
-  const url = `${API_BASE}/${encodeURIComponent(slug)}?suburb=${encodeURIComponent(suburb)}`;
-  return url;
+
+  if (USE_PROXY && PROXY_BASE) {
+    // Worker route: https://<worker>/suburb/<slug>?suburb=...
+    // or:          https://<worker>/sandbox/suburb/<slug>?suburb=...
+    return `${PROXY_BASE}/${PATH_PREFIX}/${encodeURIComponent(slug)}?suburb=${encodeURIComponent(suburb)}`;
+  }
+
+  // Direct sandbox (may still CORS-block on some origins)
+  return `${SANDBOX_BASE_DIRECT}/${encodeURIComponent(slug)}?suburb=${encodeURIComponent(suburb)}`;
 }
 
 function updateRequestUrlPreview(){
@@ -90,6 +109,7 @@ updateRequestUrlPreview();
 
 // Wire buttons
 els.suburb.addEventListener("input", updateRequestUrlPreview);
+els.endpoint.addEventListener("change", updateRequestUrlPreview);
 els.fetchBtn.addEventListener("click", onFetch);
 els.openUrlBtn.addEventListener("click", () => window.open(buildUrl(), "_blank"));
 els.copyCurlBtn.addEventListener("click", copyCurl);
@@ -101,7 +121,7 @@ async function onFetch(){
   const url = buildUrl();
   showLoadingState(true);
   try {
-    const res = await fetch(url, { method: "GET" }); // no headers (avoid preflight)
+    const res = await fetch(url, { method: "GET" }); // no headers (proxy handles auth/CORS)
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderAll(data);
@@ -173,7 +193,7 @@ function renderSummary(items){
   for (const it of items){
     const div = document.createElement("div");
     div.className = "kpi";
-    div.innerHTML = `<div class="label">${escapeHtml(it.label)}</div>
+    div.innerHTML = `<div class="label">${escapeHtml(String(it.label))}</div>
                      <div class="value">${escapeHtml(String(it.value))}</div>`;
     els.summaryCards.appendChild(div);
   }
@@ -187,7 +207,7 @@ function renderTable(data){
     const colsSet = new Set();
     for (const row of data.slice(0, N)){
       Object.keys(row || {}).forEach(k => colsSet.add(k));
-    } // <-- fixed: removed stray extra ')'
+    }
     const cols = [...colsSet];
 
     const thead = document.createElement("thead");
@@ -353,7 +373,7 @@ function formatNumber(n){
   if (Number.isInteger(n)) return n.toLocaleString();
   return n.toFixed(2);
 }
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function copyCurl(){
   const url = buildUrl();
