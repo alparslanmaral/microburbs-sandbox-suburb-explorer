@@ -1,5 +1,5 @@
-const API_BASE = "https://www.microburbs.com.au/report_generator/api/suburb";
-const AUTH = "Bearer test";
+// SANDBOX base URL (Authorization headers removed)
+const API_BASE = "https://www.microburbs.com.au/report_generator/api/sandbox/suburb";
 
 const endpointOptions = [
   { label: "Amenities", slug: "amenity" },
@@ -15,7 +15,6 @@ const endpointOptions = [
   { label: "Suburb Information", slug: "suburb-information" },
   { label: "Summary", slug: "summary" },
   { label: "Zoning", slug: "zoning" },
-  // Fallback if you want to type your own slug:
   { label: "Custom… (type your own)", slug: "__custom__" },
 ];
 
@@ -102,13 +101,7 @@ async function onFetch(){
   const url = buildUrl();
   showLoadingState(true);
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": AUTH,
-        "Content-Type": "application/json",
-      }
-    });
+    const res = await fetch(url, { method: "GET" }); // no headers (avoid preflight)
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderAll(data);
@@ -126,7 +119,6 @@ function showLoadingState(isLoading){
     els.summary.classList.add("hidden");
     els.chartSection.classList.add("hidden");
     els.tableSection.classList.add("hidden");
-    // leave JSON hidden unless toggle is on
   }
 }
 
@@ -160,7 +152,6 @@ function computeSummary(data){
   const out = [];
   if (Array.isArray(data)) {
     out.push({ label: "Items", value: data.length.toLocaleString() });
-    // Try to detect unique keys from sample
     const sampleKeys = Object.keys(flattenObject(data[0] || {}));
     out.push({ label: "Fields (sample)", value: sampleKeys.length });
     out.push({ label: "Type", value: "Array" });
@@ -171,12 +162,9 @@ function computeSummary(data){
   } else {
     out.push({ label: "Type", value: typeof data });
   }
-
-  // Heuristic: if there is a "suburb" field or similar
   const flat = flattenObject(data);
   const suburb = flat["suburb"] || flat["name"] || flat["area"] || "";
   if (suburb) out.push({ label: "Context", value: String(suburb).slice(0, 48) });
-
   return out;
 }
 
@@ -195,13 +183,13 @@ function renderSummary(items){
 function renderTable(data){
   els.dataTable.innerHTML = "";
   if (Array.isArray(data)){
-    // Build union of keys from first N items
     const N = 40;
     const colsSet = new Set();
     for (const row of data.slice(0, N)){
       Object.keys(row || {}).forEach(k => colsSet.add(k));
-    }
+    } // <-- fixed: removed stray extra ')'
     const cols = [...colsSet];
+
     const thead = document.createElement("thead");
     const htr = document.createElement("tr");
     cols.forEach(c => {
@@ -227,8 +215,7 @@ function renderTable(data){
     els.tableNote.textContent = `Showing ${data.length.toLocaleString()} rows, ${cols.length} columns.`;
     els.tableSection.classList.remove("hidden");
   } else if (data && typeof data === "object"){
-    // Show object as two-column table (key/value)
-    const flat = flattenObject(data, 2); // limit deep stringify
+    const flat = flattenObject(data, 2);
     const cols = ["key", "value"];
     const thead = document.createElement("thead");
     const htr = document.createElement("tr");
@@ -258,7 +245,6 @@ function renderTable(data){
 }
 
 function findNumericPairs(data){
-  // Return [{label, value}] from flattened primitives, top 12 by magnitude
   const flat = flattenObject(data);
   const pairs = [];
   for (const [k, v] of Object.entries(flat)) {
@@ -282,7 +268,6 @@ function renderChart(pairs){
   const canvas = els.barChart;
   const ctx = canvas.getContext("2d");
 
-  // Resize canvas to container width
   const containerWidth = canvas.parentElement.clientWidth - 20;
   canvas.width = containerWidth;
 
@@ -294,7 +279,6 @@ function renderChart(pairs){
   const totalH = topPad + (rowH + gap) * pairs.length + 12;
   canvas.height = totalH;
 
-  // background
   ctx.fillStyle = "#0b152a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -302,13 +286,11 @@ function renderChart(pairs){
 
   pairs.forEach((p, i) => {
     const y = topPad + i * (rowH + gap);
-    // label
     ctx.fillStyle = "#93a1b5";
     ctx.font = "12px Inter, sans-serif";
     const label = p.label.length > 34 ? p.label.slice(0, 31) + "…" : p.label;
     ctx.fillText(label, 8, y + 14);
 
-    // bar
     const barMaxW = canvas.width - leftPad - rightPad;
     const barW = Math.max(2, Math.round((Math.abs(p.value) / maxVal) * barMaxW));
     const x = leftPad;
@@ -316,7 +298,6 @@ function renderChart(pairs){
     ctx.fillStyle = color;
     ctx.fillRect(x, y, barW, rowH);
 
-    // value
     ctx.fillStyle = "#e6edf6";
     ctx.font = "12px Inter, sans-serif";
     ctx.fillText(formatNumber(p.value), x + barW + 6, y + 14);
@@ -376,12 +357,7 @@ function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 function copyCurl(){
   const url = buildUrl();
-  const curl = [
-    "curl", "-s",
-    "-H", `'Authorization: ${AUTH}'`,
-    "-H", "'Content-Type: application/json'",
-    `"${url}"`
-  ].join(" ");
+  const curl = ["curl","-s", `"${url}"`].join(" ");
   navigator.clipboard.writeText(curl).then(()=>{
     toast("cURL copied!");
   }).catch(()=>{

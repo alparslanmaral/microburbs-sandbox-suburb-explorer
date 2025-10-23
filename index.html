@@ -30,7 +30,7 @@
         <div class="field">
           <label for="endpoint">Endpoint</label>
           <select id="endpoint"></select>
-          <small class="hint">Matches path in /report_generator/api/suburb/{endpoint}</small>
+          <small class="hint">Uses /report_generator/api/sandbox/suburb/{endpoint}</small>
         </div>
 
         <div class="field buttons">
@@ -79,9 +79,9 @@
     <section class="card">
       <h2>About this tool</h2>
       <ul>
-        <li>Uses Microburbs Sandbox: Authorization: Bearer test</li>
-        <li>Endpoints are mapped to path segments (amenity, demographics, ethnicity, ...). You can also type a custom endpoint.</li>
-        <li>Automatically summarizes arrays and numbers; shows a simple bar chart of the strongest numeric values it detects.</li>
+        <li>Sandbox base URL: /report_generator/api/sandbox/suburb</li>
+        <li>No Authorization headers from browser (avoids preflight).</li>
+        <li>Auto summary, table, and a lightweight bar chart of numeric fields.</li>
       </ul>
     </section>
   </main>
